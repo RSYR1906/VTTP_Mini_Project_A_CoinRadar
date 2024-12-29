@@ -57,6 +57,7 @@ public class CryptoRestController {
     @CrossOrigin(origins = "https://coinradar.up.railway.app")
     @PostMapping("/user/watchlist/add")
     public ResponseEntity<String> addToWatchlist(
+            @RequestParam String username,
             @RequestParam String id,
             @RequestParam String name,
             @RequestParam String symbol,
@@ -67,7 +68,7 @@ public class CryptoRestController {
             @RequestParam(defaultValue = "") String userNotes, // Default to empty string
             HttpSession session) {
 
-        String username = (String) session.getAttribute("username");
+        username = (String) session.getAttribute("username");
 
         if (username == null) {
             return ResponseEntity.badRequest().body("Invalid username");
