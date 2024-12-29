@@ -313,13 +313,13 @@
           case "marketCap":
             return (
               parseFloat(
-                row.children[3].textContent.replace(/[^0-9.-]+/g, "")
+                row.children[4].textContent.replace(/[^0-9.-]+/g, "")
               ) || 0
             );
           case "priceChange":
             return (
               parseFloat(
-                row.children[4].textContent.replace(/[^0-9.-]+/g, "")
+                row.children[5].textContent.replace(/[^0-9.-]+/g, "")
               ) || 0
             );
           default:
