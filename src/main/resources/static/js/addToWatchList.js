@@ -9,8 +9,8 @@ function addToWatchlist(event) {
     const logoUrl = event.target.getAttribute("data-logo");
 
     // Make the POST request
-    fetch("user/watchlist/add", {
-      method: "POST",
+    fetch("https://coinradar.up.railway.app/user/watchlist/add", {
+        method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
