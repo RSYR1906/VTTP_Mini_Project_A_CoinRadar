@@ -1,16 +1,29 @@
 function addToWatchlist(event) {
-    const cryptoId = event.target.getAttribute("data-id");
-    const name = event.target.getAttribute("data-name");
-    const symbol = event.target.getAttribute("data-symbol");
-    const currentPrice = event.target.getAttribute("data-price");
-    const marketCap = event.target.getAttribute("data-marketcap");
-    const priceChangePercentage24h =
-      event.target.getAttribute("data-change");
-    const logoUrl = event.target.getAttribute("data-logo");
-
+    const button = event.target;
+  
+    // Extract data attributes
+    const cryptoId = button.getAttribute("data-id");
+    const name = button.getAttribute("data-name");
+    const symbol = button.getAttribute("data-symbol");
+    const currentPrice = button.getAttribute("data-price");
+    const marketCap = button.getAttribute("data-marketcap");
+    const priceChangePercentage24h = button.getAttribute("data-change");
+    const logoUrl = button.getAttribute("data-logo");
+  
+    // Validate required attributes
+    if (!cryptoId || !name || !symbol || !currentPrice || !marketCap || !priceChangePercentage24h || !logoUrl) {
+      alert("Invalid data. Unable to add to watchlist.");
+      return;
+    }
+  
+    // Show loading indicator
+    const originalText = button.textContent;
+    button.textContent = "Adding...";
+    button.disabled = true;
+  
     // Make the POST request
-    fetch("coinradar.up.railway.app/user/watchlist/add", {
-    method: "POST",
+    fetch("/user/watchlist/add", {
+      method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -26,15 +39,25 @@ function addToWatchlist(event) {
     })
       .then((response) => {
         if (response.ok) {
-          // Change the button's background color to green and disable it
-          event.target.style.backgroundColor = "green";
-          event.target.style.color = "white";
-          event.target.disabled = true;
-          event.target.textContent = "Added ✔";
+          // Success feedback
+          button.style.backgroundColor = "green";
+          button.style.color = "white";
+          button.textContent = "Added ✔";
           alert("Added to watchlist!");
         } else {
-          alert("Failed to add to watchlist.");
+          // Restore button state on failure
+          button.textContent = originalText;
+          button.disabled = false;
+          response.text().then((text) => {
+            console.error("Error response:", text);
+            alert("Failed to add to watchlist. Please try again.");
+          });
         }
       })
-      .catch((error) => console.error("Error:", error));
+      .catch((error) => {
+        console.error("Error:", error);
+        button.textContent = originalText;
+        button.disabled = false;
+        alert("An error occurred. Please try again.");
+      });
   }

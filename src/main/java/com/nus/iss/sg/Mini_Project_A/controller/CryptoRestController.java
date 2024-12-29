@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,6 +54,7 @@ public class CryptoRestController {
     }
 
     // Add a cryptocurrency to the user's watchlist.
+    @CrossOrigin(origins = "https://coinradar.up.railway.app")
     @PostMapping("/user/watchlist/add")
     public ResponseEntity<String> addToWatchlist(
             @RequestParam String id,
@@ -87,6 +89,7 @@ public class CryptoRestController {
     }
 
     // Remove a cryptocurrency from the user's watchlist.
+    @CrossOrigin(origins = "https://coinradar.up.railway.app")
     @PostMapping("/user/watchlist/remove")
     public ResponseEntity<String> removeFromWatchlist(@RequestParam String id, HttpSession session) {
         String username = (String) session.getAttribute("username");
