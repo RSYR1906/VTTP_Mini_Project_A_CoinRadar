@@ -53,7 +53,7 @@ public class CryptoRestController {
     }
 
     // Add a cryptocurrency to the user's watchlist.
-    @PostMapping("user/watchlist/add")
+    @PostMapping("/user/watchlist/add")
     public ResponseEntity<String> addToWatchlist(
             @RequestParam String id,
             @RequestParam String name,
@@ -87,7 +87,7 @@ public class CryptoRestController {
     }
 
     // Remove a cryptocurrency from the user's watchlist.
-    @PostMapping("user/watchlist/remove")
+    @PostMapping("/user/watchlist/remove")
     public ResponseEntity<String> removeFromWatchlist(@RequestParam String id, HttpSession session) {
         String username = (String) session.getAttribute("username");
 
