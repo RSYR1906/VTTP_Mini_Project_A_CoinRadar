@@ -37,7 +37,7 @@ public class CryptoRestController {
     }
 
     // Retrieve the user's watchlist
-    @GetMapping("/watchlist")
+    @GetMapping("api/user/watchlist")
     public ResponseEntity<List<WatchlistEntry>> getWatchlist(@RequestParam String username) {
         List<WatchlistEntry> watchlist = userService.getCryptoWatchlist(username);
         return ResponseEntity.ok(watchlist);
@@ -64,7 +64,7 @@ public class CryptoRestController {
     }
 
     // Add a crypto to the user's watchlist
-    @PostMapping("/watchlist/add")
+    @PostMapping("api/user/watchlist/add")
     public ResponseEntity<String> addToWatchlist(@RequestParam String username,
             @RequestBody WatchlistEntry entry) {
         try {
@@ -76,7 +76,7 @@ public class CryptoRestController {
     }
 
     // Remove a crypto from the user's watchlist
-    @PostMapping("/watchlist/remove")
+    @PostMapping("api/user/watchlist/remove")
     public ResponseEntity<String> removeFromWatchlist(@RequestParam String username,
             @RequestParam String cryptoId) {
         try {
