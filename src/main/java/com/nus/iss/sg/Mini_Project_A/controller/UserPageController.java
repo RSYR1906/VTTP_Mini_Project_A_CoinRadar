@@ -27,9 +27,6 @@ public class UserPageController {
     @Autowired
     private WatchlistService watchlistService;
 
-    @Autowired
-    private UserService userService;
-
     // Display an error page for invalid routes or exceptions.
     @GetMapping("/error")
     public String showErrorPage() {
@@ -41,7 +38,7 @@ public class UserPageController {
     public String showUserPage(
             @RequestParam(required = false) String username,
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(defaultValue = "60") Integer size,
             Model model,
             HttpSession session) {
 
@@ -59,7 +56,7 @@ public class UserPageController {
         cryptos.forEach(crypto -> crypto.setInWatchlist(
                 watchlist.stream().anyMatch(entry -> entry.getId().equals(crypto.getId()))));
 
-        int totalCryptos = 100;
+        int totalCryptos = 300;
         int totalPages = (int) Math.ceil((double) totalCryptos / size);
 
         model.addAttribute("currentPage", page);
