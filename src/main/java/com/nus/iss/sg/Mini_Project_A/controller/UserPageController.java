@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.nus.iss.sg.Mini_Project_A.model.CryptoData;
 import com.nus.iss.sg.Mini_Project_A.model.WatchlistEntry;
 import com.nus.iss.sg.Mini_Project_A.service.CryptoService;
-import com.nus.iss.sg.Mini_Project_A.service.UserService;
 import com.nus.iss.sg.Mini_Project_A.service.WatchlistService;
 
 import jakarta.servlet.http.HttpSession;
@@ -38,7 +37,7 @@ public class UserPageController {
     public String showUserPage(
             @RequestParam(required = false) String username,
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "60") Integer size,
+            @RequestParam(defaultValue = "20") Integer size,
             Model model,
             HttpSession session) {
 
@@ -56,7 +55,7 @@ public class UserPageController {
         cryptos.forEach(crypto -> crypto.setInWatchlist(
                 watchlist.stream().anyMatch(entry -> entry.getId().equals(crypto.getId()))));
 
-        int totalCryptos = 300;
+        int totalCryptos = 100;
         int totalPages = (int) Math.ceil((double) totalCryptos / size);
 
         model.addAttribute("currentPage", page);
