@@ -15,9 +15,8 @@ function removeFromWatchlist(event) {
     button.disabled = true;
 
     // Make an AJAX call to remove the crypto from the watchlist
-    const BASE_URL = window.location.origin; // Dynamically get the base URL
-    fetch(`${BASE_URL}/user/watchlist/remove`, { 
-               method: "POST",
+    fetch("coinradar.up.railway.app/user/watchlist/remove", { 
+    method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },

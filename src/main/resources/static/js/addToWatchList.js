@@ -9,9 +9,8 @@ function addToWatchlist(event) {
     const logoUrl = event.target.getAttribute("data-logo");
 
     // Make the POST request
-    const BASE_URL = window.location.origin; // Dynamically get the base URL
-    fetch(`${BASE_URL}/user/watchlist/add`, {
-        method: "POST",
+    fetch("coinradar.up.railway.app/user/watchlist/add", {
+    method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
