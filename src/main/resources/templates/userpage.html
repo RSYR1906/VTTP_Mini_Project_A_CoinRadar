@@ -152,7 +152,6 @@
 
       // Add to watchlist
       function addToWatchlist(event) {
-        const username = "[[${username}]]"; // Pass username dynamically from Thymeleaf
         const cryptoId = event.target.getAttribute("data-id");
         const name = event.target.getAttribute("data-name");
         const symbol = event.target.getAttribute("data-symbol");
@@ -169,7 +168,6 @@
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
-            username: username, // Include username
             id: cryptoId,
             name: name,
             symbol: symbol,
@@ -178,17 +176,19 @@
             priceChangePercentage24h: priceChangePercentage24h,
             logoUrl: logoUrl,
           }),
+          credentials: "include", // Ensure session cookies are sent with the request
         })
           .then((response) => {
             if (response.ok) {
-              // Update button style and text
               event.target.style.backgroundColor = "green";
               event.target.style.color = "white";
               event.target.disabled = true;
               event.target.textContent = "Added ✔";
               alert("Added to watchlist!");
             } else {
-              alert("Failed to add to watchlist.");
+              response
+                .text()
+                .then((text) => alert("Failed to add to watchlist: " + text));
             }
           })
           .catch((error) => console.error("Error:", error));

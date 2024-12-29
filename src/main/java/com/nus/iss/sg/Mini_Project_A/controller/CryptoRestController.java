@@ -54,10 +54,9 @@ public class CryptoRestController {
     }
 
     // Add a cryptocurrency to the user's watchlist.
-    @CrossOrigin(origins = "https://coinradar.up.railway.app")
+    @CrossOrigin(origins = "https://coinradar.up.railway.app", allowCredentials = "true")
     @PostMapping("/user/watchlist/add")
     public ResponseEntity<String> addToWatchlist(
-            @RequestParam String username,
             @RequestParam String id,
             @RequestParam String name,
             @RequestParam String symbol,
@@ -65,14 +64,16 @@ public class CryptoRestController {
             @RequestParam BigDecimal marketCap,
             @RequestParam BigDecimal priceChangePercentage24h,
             @RequestParam String logoUrl,
-            @RequestParam(defaultValue = "") String userNotes, // Default to empty string
+            @RequestParam(defaultValue = "") String userNotes,
             HttpSession session) {
 
-        username = (String) session.getAttribute("username");
+        // Retrieve username from session
+        String username = (String) session.getAttribute("username");
 
-        if (username == null) {
-            return ResponseEntity.badRequest().body("Invalid username");
+        if (username == null || username.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
+
         // Create a new watchlist entry
         WatchlistEntry entry = new WatchlistEntry();
         entry.setId(id);
@@ -82,11 +83,12 @@ public class CryptoRestController {
         entry.setMarketCap(marketCap);
         entry.setPriceChangePercentage24h(priceChangePercentage24h);
         entry.setLogoUrl(logoUrl);
-        entry.setUserNotes(userNotes == null || userNotes.trim().isEmpty() ? "" : userNotes);
+        entry.setUserNotes(userNotes.trim().isEmpty() ? "" : userNotes);
 
+        // Add entry to the user's watchlist
         watchlistService.addToUserWatchlist(username, entry);
 
-        return ResponseEntity.ok().body("Added to watchlist");
+        return ResponseEntity.ok("Added to watchlist");
     }
 
     // Remove a cryptocurrency from the user's watchlist.
