@@ -2,6 +2,8 @@ package com.nus.iss.sg.Mini_Project_A.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,8 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/")
 public class HomePageController {
+
+    private static final Logger logger = LoggerFactory.getLogger(HomePageController.class);
 
     @Autowired
     private CryptoService cryptoService;
@@ -84,13 +88,16 @@ public class HomePageController {
         boolean isAuthenticated = userService.authenticateUser(user.getUsername(), user.getPassword());
 
         if (isAuthenticated) {
+            // Add username to session
             session.setAttribute("username", user.getUsername());
+            logger.info("Username '{}' added to session.", user.getUsername());
 
             List<WatchlistEntry> watchlist = userService.getCryptoWatchlist(user.getUsername());
             model.addAttribute("watchlist", watchlist);
 
             return "redirect:/user?username=" + user.getUsername() + "&page=" + page + "&size=" + size;
         } else {
+            logger.warn("Failed login attempt for username: {}", user.getUsername());
             model.addAttribute("showWrongPassMessage", true);
             return "login";
         }
