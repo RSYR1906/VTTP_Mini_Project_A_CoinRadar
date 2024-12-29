@@ -1,4 +1,5 @@
 function removeFromWatchlist(event) {
+    const username = "[[${username}]]";
     const button = event.target; // Fix: Use event.target to get the clicked button
     const cryptoId = button.getAttribute("data-id");
 
@@ -15,12 +16,15 @@ function removeFromWatchlist(event) {
     button.disabled = true;
 
     // Make an AJAX call to remove the crypto from the watchlist
-    fetch("coinradar.up.railway.app/user/watchlist/remove", { 
+    fetch("https://coinradar.up.railway.app/user/watchlist/remove", { 
     method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({ id: cryptoId }),
+      body: new URLSearchParams({
+        username: username,
+        id: cryptoId 
+    }),
     })
       .then((response) => {
         if (response.ok) {

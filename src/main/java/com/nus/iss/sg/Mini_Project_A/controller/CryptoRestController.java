@@ -99,8 +99,9 @@ public class CryptoRestController {
     // Remove a cryptocurrency from the user's watchlist.
     @CrossOrigin(origins = "https://coinradar.up.railway.app")
     @PostMapping("/user/watchlist/remove")
-    public ResponseEntity<String> removeFromWatchlist(@RequestParam String id, HttpSession session) {
-        String username = (String) session.getAttribute("username");
+    public ResponseEntity<String> removeFromWatchlist(@RequestParam String id, @RequestParam String username,
+            HttpSession session) {
+        username = (String) session.getAttribute("username");
 
         if (username == null) {
             return ResponseEntity.badRequest().body("Invalid username");
