@@ -1,12 +1,12 @@
 function addToWatchlist(event) {
-    const button = event.target;
-    const cryptoId = button.getAttribute("data-id");
-    const name = button.getAttribute("data-name");
-    const symbol = button.getAttribute("data-symbol");
-    const currentPrice = button.getAttribute("data-price");
-    const marketCap = button.getAttribute("data-marketcap");
-    const priceChangePercentage24h = button.getAttribute("data-change");
-    const logoUrl = button.getAttribute("data-logo");
+    const cryptoId = event.target.getAttribute("data-id");
+    const name = event.target.getAttribute("data-name");
+    const symbol = event.target.getAttribute("data-symbol");
+    const currentPrice = event.target.getAttribute("data-price");
+    const marketCap = event.target.getAttribute("data-marketcap");
+    const priceChangePercentage24h =
+      event.target.getAttribute("data-change");
+    const logoUrl = event.target.getAttribute("data-logo");
 
     // Make the POST request
     fetch("/watchlist/add", {
