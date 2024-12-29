@@ -184,7 +184,13 @@
                   alt="Logo"
                   class="crypto-logo"
                 />
-                <span th:text="${crypto.name}">Coin Name</span>
+                <a
+                  th:href="@{'/user/crypto/details?id=' + ${crypto.id} + '&symbol=' + ${crypto.symbol}}"
+                  th:text="${crypto.name}"
+                  class="text-light text-decoration-none"
+                >
+                  Coin Name
+                </a>
               </td>
               <td th:text="${crypto.symbol.toUpperCase()}"></td>
               <td
@@ -201,6 +207,12 @@
                 <button
                   class="btn btn-outline-secondary"
                   th:data-id="${crypto.id}"
+                  th:data-name="${crypto.name}"
+                  th:data-symbol="${crypto.symbol}"
+                  th:data-price="${crypto.currentPrice}"
+                  th:data-marketcap="${crypto.marketCap}"
+                  th:data-change="${crypto.priceChangePercentage24h}"
+                  th:data-logo="${crypto.logoUrl}"
                   onclick="addToWatchlist(event)"
                 >
                   ⭐
@@ -252,21 +264,44 @@
       function addToWatchlist(event) {
         const username = "[[${username}]]";
         const cryptoId = event.target.getAttribute("data-id");
+        const name = event.target.getAttribute("data-name");
+        const symbol = event.target.getAttribute("data-symbol");
+        const currentPrice = event.target.getAttribute("data-price");
+        const marketCap = event.target.getAttribute("data-marketcap");
+        const priceChangePercentage24h =
+          event.target.getAttribute("data-change");
+        const logoUrl = event.target.getAttribute("data-logo");
 
+        // Make the POST request
         fetch("/user/watchlist/add", {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({ username, id: cryptoId }),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            username: username,
+            id: cryptoId,
+            name: name,
+            symbol: symbol,
+            currentPrice: currentPrice,
+            marketCap: marketCap,
+            priceChangePercentage24h: priceChangePercentage24h,
+            logoUrl: logoUrl,
+          }),
         })
           .then((response) => {
             if (response.ok) {
+              // Change the button's background color to green and disable it
+              event.target.style.backgroundColor = "green";
+              event.target.style.color = "white";
+              event.target.disabled = true;
               event.target.textContent = "Added ✔";
               alert("Added to watchlist!");
             } else {
-              alert("Failed to add.");
+              alert("Failed to add to watchlist.");
             }
           })
-          .catch(console.error);
+          .catch((error) => console.error("Error:", error));
       }
 
       let sortOrder = {
