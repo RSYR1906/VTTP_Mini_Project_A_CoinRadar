@@ -9,7 +9,7 @@ function addToWatchlist(event) {
     const logoUrl = event.target.getAttribute("data-logo");
 
     // Make the POST request
-    fetch("/watchlist/add", {
+    fetch("user/watchlist/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -27,10 +27,10 @@ function addToWatchlist(event) {
       .then((response) => {
         if (response.ok) {
           // Change the button's background color to green and disable it
-          button.style.backgroundColor = "green";
-          button.style.color = "white";
-          button.disabled = true;
-          button.textContent = "Added ✔";
+          event.target.style.backgroundColor = "green";
+          event.target.style.color = "white";
+          event.target.disabled = true;
+          event.target.textContent = "Added ✔";
           alert("Added to watchlist!");
         } else {
           alert("Failed to add to watchlist.");

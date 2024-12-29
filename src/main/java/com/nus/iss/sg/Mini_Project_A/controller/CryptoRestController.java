@@ -1,5 +1,6 @@
 package com.nus.iss.sg.Mini_Project_A.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nus.iss.sg.Mini_Project_A.model.CryptoData;
 import com.nus.iss.sg.Mini_Project_A.model.WatchlistEntry;
 import com.nus.iss.sg.Mini_Project_A.service.CryptoService;
-import com.nus.iss.sg.Mini_Project_A.service.UserService;
 import com.nus.iss.sg.Mini_Project_A.service.WatchlistService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,19 +27,9 @@ public class CryptoRestController {
     @Autowired
     private WatchlistService watchlistService;
 
-    @Autowired
-    private UserService userService;
-
     @GetMapping("/api/cryptos")
     public List<CryptoData> getCryptoList(Integer page, Integer size) {
         return cryptoService.getCryptos(1, 50);
-    }
-
-    // Retrieve the user's watchlist
-    @GetMapping("api/user/watchlist")
-    public ResponseEntity<List<WatchlistEntry>> getWatchlist(@RequestParam String username) {
-        List<WatchlistEntry> watchlist = userService.getCryptoWatchlist(username);
-        return ResponseEntity.ok(watchlist);
     }
 
     @PostMapping("/user/watchlist/update-note")
@@ -63,27 +52,56 @@ public class CryptoRestController {
         }
     }
 
-    // Add a crypto to the user's watchlist
-    @PostMapping("api/user/watchlist/add")
-    public ResponseEntity<String> addToWatchlist(@RequestParam String username,
-            @RequestBody WatchlistEntry entry) {
-        try {
-            userService.addCryptoToWatchlist(username, entry);
-            return ResponseEntity.ok("Crypto added to watchlist successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    // Add a cryptocurrency to the user's watchlist.
+    @PostMapping("user/watchlist/add")
+    public ResponseEntity<String> addToWatchlist(
+            @RequestParam String id,
+            @RequestParam String name,
+            @RequestParam String symbol,
+            @RequestParam BigDecimal currentPrice,
+            @RequestParam BigDecimal marketCap,
+            @RequestParam BigDecimal priceChangePercentage24h,
+            @RequestParam String logoUrl,
+            @RequestParam(defaultValue = "") String userNotes, // Default to empty string
+            HttpSession session) {
+
+        String username = (String) session.getAttribute("username");
+
+        if (username == null) {
+            return ResponseEntity.badRequest().body("Invalid username");
         }
+        // Create a new watchlist entry
+        WatchlistEntry entry = new WatchlistEntry();
+        entry.setId(id);
+        entry.setName(name);
+        entry.setSymbol(symbol);
+        entry.setCurrentPrice(currentPrice);
+        entry.setMarketCap(marketCap);
+        entry.setPriceChangePercentage24h(priceChangePercentage24h);
+        entry.setLogoUrl(logoUrl);
+        entry.setUserNotes(userNotes == null || userNotes.trim().isEmpty() ? "" : userNotes);
+
+        watchlistService.addToUserWatchlist(username, entry);
+
+        return ResponseEntity.ok().body("Added to watchlist");
     }
 
-    // Remove a crypto from the user's watchlist
-    @PostMapping("api/user/watchlist/remove")
-    public ResponseEntity<String> removeFromWatchlist(@RequestParam String username,
-            @RequestParam String cryptoId) {
-        try {
-            userService.removeCryptoFromWatchlist(username, cryptoId);
-            return ResponseEntity.ok("Crypto removed from watchlist successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    // Remove a cryptocurrency from the user's watchlist.
+    @PostMapping("user/watchlist/remove")
+    public ResponseEntity<String> removeFromWatchlist(@RequestParam String id, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+
+        if (username == null) {
+            return ResponseEntity.badRequest().body("Invalid username");
         }
+
+        List<WatchlistEntry> watchlist = watchlistService.getUserWatchlist(username);
+        boolean removed = watchlist.removeIf(entry -> entry.getId().equals(id));
+
+        if (removed) {
+            watchlistService.updateUserWatchlist(username, watchlist);
+        }
+
+        return ResponseEntity.ok().body("Removed from watchlist");
     }
 }

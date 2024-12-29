@@ -39,13 +39,14 @@ public class UserService {
 
     // Add a crypto entry to the user's watchlist
     public void addCryptoToWatchlist(String username, WatchlistEntry entry) {
+        if (username == null || entry == null) {
+            throw new IllegalArgumentException("Username or entry cannot be null");
+        }
         List<WatchlistEntry> watchlist = userRepository.getWatchlist(username);
-
-        // Prevent duplicates in the watchlist
-        boolean exists = watchlist.stream()
-                .anyMatch(existingEntry -> existingEntry.getId().equals(entry.getId()));
-
-        if (!exists) {
+        if (watchlist == null) {
+            watchlist = new ArrayList<>();
+        }
+        if (watchlist.stream().noneMatch(e -> e.getId().equals(entry.getId()))) {
             watchlist.add(entry);
             userRepository.saveWatchlist(username, watchlist);
         }
