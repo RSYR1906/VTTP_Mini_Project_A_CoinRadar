@@ -3,18 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CoinRadar - Cryptocurrency Tracker</title>
+    <title>Cryptocurrency Price Tracker</title>
     <!-- Bootstrap CSS -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
+      th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"
     />
     <!-- Bootstrap Icons -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap.min.css"
     />
     <!-- Google Fonts -->
     <link
@@ -25,9 +23,121 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <link rel="stylesheet" th:href="@{/css/nav.css}" />
     <style>
+      .slider-container {
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+        width: 100%;
+        background-color: #343a40;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+      }
+
+      .slider-container p {
+        font-size: larger;
+        color: Orange;
+      }
+
+      .slider {
+        display: flex;
+        gap: 20px;
+        animation: slide 15s linear infinite;
+      }
+
+      @keyframes slide {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+
+      .slider-item {
+        display: inline-block;
+        background-color: #444;
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        min-width: 150px;
+        flex-shrink: 0;
+        font-size: 0.8rem;
+      }
+
+      .slider-item img {
+        max-width: 30px;
+        height: 30px;
+        margin-bottom: 5px;
+        border-radius: 50%;
+        border: 1px solid #e07b12;
+        padding: 5px;
+        background-color: #fff;
+      }
+
+      .slider-item a {
+        text-decoration: none;
+        color: #e07b12;
+      }
+
+      .slider-item a:hover {
+        color: #ffbe0b;
+      }
+
+      .header-section h1 {
+        color: #f39c12;
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
+      .header-section p {
+        color: #f8f9fa;
+      }
+
+      .table {
+        margin-top: 20px;
+      }
+      .table th {
+        background-color: #444;
+        color: #e07b12;
+        cursor: pointer;
+      }
+      .table tbody tr:hover {
+        background-color: rgba(224, 123, 18, 0.1);
+      }
       .crypto-logo {
         width: 32px;
         height: 32px;
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: #e07b12;
+        border-color: #e07b12;
+      }
+
+      footer {
+        background-color: #343a40;
+        color: #fff;
+        text-align: center;
+        padding: 10px 0;
+        margin-top: 40px;
+        font-size: 0.9rem;
+      }
+
+      .search-input {
+        border: 1px solid #343a40;
+        border-radius: 25px;
+        overflow: hidden;
+      }
+      .search-input input {
+        border: none;
+        border-radius: 0;
+      }
+      .search-input button {
+        background-color: #e07b12;
+        color: white;
+        border: none;
+        border-radius: 0;
       }
       .btn-added {
         background-color: green !important;
@@ -77,18 +187,48 @@
         </p>
       </div>
 
+      <!-- Search Bar -->
+      <form
+        action="/user/search"
+        method="get"
+        class="d-flex mb-4 justify-content-center"
+      >
+        <div class="input-group search-input">
+          <input
+            type="text"
+            name="query"
+            class="form-control"
+            placeholder="Search for a cryptocurrency..."
+            aria-label="Search for a cryptocurrency"
+          />
+          <button class="btn" type="submit" id="search-button">Search</button>
+        </div>
+      </form>
+
+      <!-- Slider Section -->
+      <div class="slider-container">
+        <p><strong>Trending coins</strong></p>
+        <div id="trending-slider" class="slider">
+          <!-- Dynamic Content will be added here -->
+        </div>
+      </div>
+
       <!-- Cryptocurrency Table -->
       <div class="table-responsive">
         <table class="table table-dark table-striped table-hover">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Coin</th>
-              <th>Symbol</th>
-              <th>Current Price (USD)</th>
-              <th>Market Cap (USD)</th>
-              <th>24h Change (%)</th>
-              <th>Watchlist</th>
+              <th scope="col">#</th>
+              <th scope="col">Coin</th>
+              <th scope="col">Symbol</th>
+              <th scope="col">Current Price (USD)</th>
+              <th scope="col" onclick="sortTable('marketCap', this)">
+                Market Cap (USD)
+              </th>
+              <th scope="col" onclick="sortTable('priceChange', this)">
+                24h Change (%)
+              </th>
+              <th scope="col">Watchlist</th>
             </tr>
           </thead>
           <tbody>
@@ -102,7 +242,13 @@
                   alt="Logo"
                   class="me-2 crypto-logo"
                 />
-                <span th:text="${crypto.name}">Coin Name</span>
+                <a
+                  th:href="@{'/user/crypto/details?id=' + ${crypto.id} + '&symbol=' + ${crypto.symbol}}"
+                  th:text="${crypto.name}"
+                  class="text-light text-decoration-none"
+                >
+                  Coin Name
+                </a>
               </td>
               <td th:text="${crypto.symbol.toUpperCase()}"></td>
               <td
@@ -134,6 +280,25 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li
+              th:each="i : ${#numbers.sequence(1, totalPages)}"
+              class="page-item"
+              th:classappend="${currentPage == i ? 'active' : ''}"
+            >
+              <a
+                class="page-link"
+                th:href="@{/user(page=${i}, size=${pageSize}, username=${username})}"
+                th:text="${i}"
+              ></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
 
     <!-- Footer -->
@@ -141,21 +306,24 @@
       <div>© 2024 CoinRadar. All rights reserved.</div>
     </footer>
 
-    <!-- Scripts -->
+    <!-- Bootstrap JS -->
+    <script
+      th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"
+    ></script>
+    <script th:src="@{/js/fetchLiveCryptoData.js}"></script>
+    <script th:src="@{/js/addToWatchList.js}"></script>
     <script>
-      // Navigate to the news page
       function navigateToNews() {
         window.location.href = "/user/news";
       }
 
-      // Navigate to the watchlist page
       function navigateToWatchlist() {
         window.location.href = "/user/watchlist";
       }
 
       // Add to watchlist
       function addToWatchlist(event) {
-        const username = "[[${username}]]";
+        const username = "[[${username}]]"; // Pass username dynamically from Thymeleaf
         const cryptoId = event.target.getAttribute("data-id");
         const name = event.target.getAttribute("data-name");
         const symbol = event.target.getAttribute("data-symbol");
@@ -166,13 +334,13 @@
         const logoUrl = event.target.getAttribute("data-logo");
 
         // Make the POST request
-        fetch("https://coinradar.up.railway.app/user/watchlist/add", {
+        fetch("/user/watchlist/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
-            username: username,
+            username: username, // Include username
             id: cryptoId,
             name: name,
             symbol: symbol,
@@ -181,23 +349,133 @@
             priceChangePercentage24h: priceChangePercentage24h,
             logoUrl: logoUrl,
           }),
-          credentials: "include", // Ensure session cookies are sent with the request
         })
           .then((response) => {
             if (response.ok) {
+              // Update button style and text
               event.target.style.backgroundColor = "green";
               event.target.style.color = "white";
               event.target.disabled = true;
               event.target.textContent = "Added ✔";
               alert("Added to watchlist!");
             } else {
-              response
-                .text()
-                .then((text) => alert("Failed to add to watchlist: " + text));
+              alert("Failed to add to watchlist.");
             }
           })
           .catch((error) => console.error("Error:", error));
       }
+
+      let sortOrder = {
+        marketCap: "asc",
+        priceChange: "asc",
+      };
+
+      function sortTable(column, header) {
+        const table = document.querySelector("table tbody");
+        const rows = Array.from(table.querySelectorAll("tr"));
+
+        // Determine the sort direction
+        const direction = sortOrder[column] === "asc" ? 1 : -1;
+        sortOrder[column] = sortOrder[column] === "asc" ? "desc" : "asc";
+
+        // Sort rows based on the column
+        rows.sort((a, b) => {
+          const valueA = getColumnValue(a, column);
+          const valueB = getColumnValue(b, column);
+
+          if (valueA < valueB) return -1 * direction;
+          if (valueA > valueB) return 1 * direction;
+          return 0;
+        });
+
+        // Remove and append sorted rows back to the table
+        rows.forEach((row) => table.appendChild(row));
+
+        // Reset all headers' styles
+        document
+          .querySelectorAll("th")
+          .forEach((th) => th.classList.remove("sorted-asc", "sorted-desc"));
+
+        // Apply sorting styles to the clicked header
+        if (sortOrder[column] === "asc") {
+          header.classList.add("sorted-asc");
+        } else {
+          header.classList.add("sorted-desc");
+        }
+      }
+
+      function getColumnValue(row, column) {
+        switch (column) {
+          case "marketCap":
+            return (
+              parseFloat(
+                row.children[3].textContent.replace(/[^0-9.-]+/g, "")
+              ) || 0
+            );
+          case "priceChange":
+            return (
+              parseFloat(
+                row.children[4].textContent.replace(/[^0-9.-]+/g, "")
+              ) || 0
+            );
+          default:
+            return 0;
+        }
+      }
+
+      // Attach event listeners to specific headers
+      document.querySelectorAll("th").forEach((header, index) => {
+        const column = header.getAttribute("data-column");
+        if (column === "marketCap" || column === "priceChange") {
+          header.addEventListener("click", () => sortTable(column, header));
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const slider = document.getElementById("trending-slider");
+
+        fetch("https://api.coingecko.com/api/v3/search/trending")
+          .then((response) => response.json())
+          .then((data) => {
+            const coins = data.coins;
+
+            coins.forEach((coin) => {
+              const coinHtml = `
+                <div class="slider-item">
+                  <img src="${coin.item.thumb}" alt="${coin.item.name}">
+                  <h5 style="color: white;">
+                    <a href="/user/crypto/details?id=${
+                      coin.item.id
+                    }" style="color: orange;">
+                      ${coin.item.name} (${coin.item.symbol.toUpperCase()})
+                    </a>
+                  </h5>
+                  <p style="color: white;">Rank: ${
+                    coin.item.market_cap_rank
+                  }</p>
+                </div>
+              `;
+              slider.innerHTML += coinHtml;
+            });
+
+            // Start slider animation
+            const slideInterval = 100; // Adjust this value to control speed
+            let scrollPosition = 0;
+
+            setInterval(() => {
+              scrollPosition -= 0.5; // Adjust this value for speed (smaller = slower)
+              slider.style.transform = `translateX(${scrollPosition}px)`;
+
+              // Reset slider position
+              if (Math.abs(scrollPosition) >= slider.scrollWidth) {
+                scrollPosition = slider.clientWidth;
+              }
+            }, slideInterval);
+          })
+          .catch((error) =>
+            console.error("Error fetching trending coins:", error)
+          );
+      });
     </script>
   </body>
 </html>
