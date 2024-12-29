@@ -23,7 +23,7 @@ function removeFromWatchlist(event) {
       },
       body: new URLSearchParams({
         username: username,
-        id: cryptoId 
+        id: cryptoId,
     }),
     })
       .then((response) => {
