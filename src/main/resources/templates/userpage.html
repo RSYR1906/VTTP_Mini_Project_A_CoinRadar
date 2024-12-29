@@ -152,6 +152,7 @@
 
       // Add to watchlist
       function addToWatchlist(event) {
+        const username = "[[${username}]]";
         const cryptoId = event.target.getAttribute("data-id");
         const name = event.target.getAttribute("data-name");
         const symbol = event.target.getAttribute("data-symbol");
@@ -168,6 +169,7 @@
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
+            username: username,
             id: cryptoId,
             name: name,
             symbol: symbol,

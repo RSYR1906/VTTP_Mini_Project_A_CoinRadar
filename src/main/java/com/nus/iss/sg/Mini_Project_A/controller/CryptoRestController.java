@@ -57,6 +57,7 @@ public class CryptoRestController {
     @CrossOrigin(origins = "https://coinradar.up.railway.app", allowCredentials = "true")
     @PostMapping("/user/watchlist/add")
     public ResponseEntity<String> addToWatchlist(
+            @RequestParam String username,
             @RequestParam String id,
             @RequestParam String name,
             @RequestParam String symbol,
@@ -68,10 +69,14 @@ public class CryptoRestController {
             HttpSession session) {
 
         // Retrieve username from session
-        String username = (String) session.getAttribute("username");
+        username = (String) session.getAttribute("username");
 
-        if (username == null || username.trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        // Fallback to session username
+        if (username == null) {
+            username = (String) session.getAttribute("username");
+            if (username == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+            }
         }
 
         // Create a new watchlist entry
